@@ -1,0 +1,98 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class SimplePong extends JPanel implements KeyListener, ActionListener {
+
+    private int paddleX = 250;   // Paddle position
+    private int ballX = 120;     // Ball X position
+    private int ballY = 120;     // Ball Y position
+    private int ballXDir = 1;    // Ball X direction
+    private int ballYDir = 2;    // Ball Y direction
+
+    private Timer timer;
+
+    public SimplePong() {
+        addKeyListener(this);
+        setFocusable(true);
+        timer = new Timer(5, this); // Slows down game speed
+        timer.start();
+    }
+
+    public void paint(Graphics g) {
+        // Background
+        g.setColor(Color.black);
+        g.fillRect(0, 0, 600, 400);
+
+        // Paddle
+        g.setColor(Color.green);
+        g.fillRect(paddleX, 350, 100, 10); // Paddle size is 100x10
+
+        // Ball
+        g.setColor(Color.yellow);
+        g.fillOval(ballX, ballY, 20, 20);  // Ball size is 20x20
+
+        g.dispose();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ballX += ballXDir;
+        ballY += ballYDir;
+
+        // Ball bounce on left/right walls
+        if (ballX < 0 || ballX > 580) {
+            ballXDir = -ballXDir;
+        }
+
+        // Ball bounce on top wall
+        if (ballY < 0) {
+            ballYDir = -ballYDir;
+        }
+
+        // Ball bounce on paddle
+        if (ballY >= 340 && ballX >= paddleX && ballX <= paddleX + 100) {
+            ballYDir = -ballYDir;
+        }
+
+        // Reset ball if it hits the bottom
+        if (ballY > 380) {
+            ballX = 120;
+            ballY = 120;
+        }
+
+        repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        // Move paddle right
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            if (paddleX < 500) {
+                paddleX += 20;
+            }
+        }
+
+        // Move paddle left
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            if (paddleX > 0) {
+                paddleX -= 20;
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Simple Pong");
+        SimplePong pongGame = new SimplePong();
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(pongGame);
+        frame.setVisible(true);
+    }
+}
